@@ -127,6 +127,7 @@ export default function FrameExtractor() {
         onDownloadAll={downloadAll}
         isCreatingZip={isCreatingZip}
         downloadAllButtonText="Download All"
+        showPreview={true}
         formatFileSize={formatFileSize}
       />
 

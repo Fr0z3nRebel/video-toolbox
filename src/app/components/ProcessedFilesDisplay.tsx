@@ -1,6 +1,7 @@
 "use client";
 
-import { Download, ImageIcon } from "lucide-react";
+import { useState } from "react";
+import { Download, ImageIcon, X } from "lucide-react";
 
 export interface ProcessedFile {
   name: string;
@@ -19,6 +20,7 @@ interface ProcessedFilesDisplayProps {
   isCreatingZip: boolean;
   downloadAllButtonText: string;
   showStats?: boolean;
+  showPreview?: boolean; // Show image preview thumbnails
   onFileSelect?: (index: number) => void;
   selectedIndex?: number;
   shouldDisableIndividualDownload?: (fileName: string) => boolean;
@@ -42,12 +44,15 @@ export default function ProcessedFilesDisplay({
   isCreatingZip,
   downloadAllButtonText,
   showStats = false,
+  showPreview = false,
   onFileSelect,
   selectedIndex,
   shouldDisableIndividualDownload,
   formatFileSize = defaultFormatFileSize,
   children
 }: ProcessedFilesDisplayProps) {
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
   const totalOriginalSize = files.reduce((sum, file) => sum + (file.originalSize || 0), 0);
   const totalProcessedSize = files.reduce((sum, file) => sum + (file.processedSize || file.blob.size), 0);
   const overallSavings = totalOriginalSize > 0 ? ((totalOriginalSize - totalProcessedSize) / totalOriginalSize) * 100 : 0;
@@ -87,68 +92,115 @@ export default function ProcessedFilesDisplay({
             </div>
           )}
 
-          {/* File List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto">
-            {files.map((file, index) => (
-              <div
-                key={index}
-                className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
-                  onFileSelect && selectedIndex === index
-                    ? "border-2 border-blue-500 bg-blue-50 cursor-pointer"
-                    : onFileSelect
-                    ? "bg-gray-50 hover:bg-gray-100 cursor-pointer"
-                    : "bg-gray-50"
-                }`}
-                onClick={() => onFileSelect?.(index)}
-              >
-                <ImageIcon className="h-5 w-5 text-gray-400 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {file.name}
-                  </p>
-                  <div className="text-xs text-gray-500 space-y-1">
-                    {file.processedSize && file.originalSize ? (
-                      <>
-                        <p>{formatFileSize(file.processedSize)} (was {formatFileSize(file.originalSize)})</p>
-                        {file.compressionRatio !== undefined && (
-                          <p className="text-green-600 font-medium">
-                            {file.compressionRatio.toFixed(1)}% smaller
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      <p>{formatFileSize(file.blob.size)}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {onFileSelect && selectedIndex === index && (
-                    <div className="text-xs text-blue-600 font-medium hidden sm:block">
-                      Comparing
+          {/* File List - Preview Mode */}
+          {showPreview ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {files.map((file, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-50 rounded-lg overflow-hidden border border-gray-200"
+                >
+                  {/* Image Preview */}
+                  <div
+                    className="relative aspect-video bg-gray-100 cursor-pointer group"
+                    onClick={() => setLightboxIndex(index)}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={file.url}
+                      alt={file.name}
+                      className="w-full h-full object-contain"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                      <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
+                        Click to enlarge
+                      </span>
                     </div>
-                  )}
-                  {!shouldDisableIndividualDownload?.(file.name) ? (
+                  </div>
+                  {/* File Info */}
+                  <div className="p-3">
+                    <p className="text-sm font-medium text-gray-900 truncate mb-1">
+                      {file.name}
+                    </p>
+                    <p className="text-xs text-gray-500 mb-2">
+                      {formatFileSize(file.blob.size)}
+                    </p>
                     <a
                       href={file.url}
                       download={file.name}
-                      className="text-blue-600 hover:text-blue-700 transition-colors"
-                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 text-sm text-purple-600 hover:text-purple-700 transition-colors font-medium"
                     >
                       <Download className="h-4 w-4" />
+                      Download
                     </a>
-                  ) : (
-                    <div 
-                      className="text-gray-400" 
-                      title="Individual download not supported for this file type in your browser"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Download className="h-4 w-4" />
-                    </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            /* File List - Compact Mode */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto">
+              {files.map((file, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                    onFileSelect && selectedIndex === index
+                      ? "border-2 border-blue-500 bg-blue-50 cursor-pointer"
+                      : onFileSelect
+                      ? "bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                      : "bg-gray-50"
+                  }`}
+                  onClick={() => onFileSelect?.(index)}
+                >
+                  <ImageIcon className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {file.name}
+                    </p>
+                    <div className="text-xs text-gray-500 space-y-1">
+                      {file.processedSize && file.originalSize ? (
+                        <>
+                          <p>{formatFileSize(file.processedSize)} (was {formatFileSize(file.originalSize)})</p>
+                          {file.compressionRatio !== undefined && (
+                            <p className="text-green-600 font-medium">
+                              {file.compressionRatio.toFixed(1)}% smaller
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <p>{formatFileSize(file.blob.size)}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {onFileSelect && selectedIndex === index && (
+                      <div className="text-xs text-blue-600 font-medium hidden sm:block">
+                        Comparing
+                      </div>
+                    )}
+                    {!shouldDisableIndividualDownload?.(file.name) ? (
+                      <a
+                        href={file.url}
+                        download={file.name}
+                        className="text-blue-600 hover:text-blue-700 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Download className="h-4 w-4" />
+                      </a>
+                    ) : (
+                      <div
+                        className="text-gray-400"
+                        title="Individual download not supported for this file type in your browser"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Download className="h-4 w-4" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           <button
             onClick={onDownloadAll}
@@ -162,6 +214,45 @@ export default function ProcessedFilesDisplay({
 
       {/* Additional content like comparison view */}
       {children}
+
+      {/* Lightbox Modal */}
+      {lightboxIndex !== null && files[lightboxIndex] && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setLightboxIndex(null)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
+            onClick={() => setLightboxIndex(null)}
+          >
+            <X className="h-8 w-8" />
+          </button>
+          <div
+            className="max-w-full max-h-full flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={files[lightboxIndex].url}
+              alt={files[lightboxIndex].name}
+              className="max-w-full max-h-[80vh] object-contain"
+            />
+            <div className="mt-4 text-center">
+              <p className="text-white font-medium mb-2">
+                {files[lightboxIndex].name}
+              </p>
+              <a
+                href={files[lightboxIndex].url}
+                download={files[lightboxIndex].name}
+                className="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                <Download className="h-4 w-4" />
+                Download
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
