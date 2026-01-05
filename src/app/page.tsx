@@ -1,4 +1,4 @@
-import { Film } from "lucide-react";
+import { Film, Clapperboard } from "lucide-react";
 import Link from "next/link";
 
 interface ToolCardProps {
@@ -68,7 +68,14 @@ export default function Home() {
       color: "hover:border-purple-200",
       badge: "New"
     },
-    // More tools can be added here in the future
+    {
+      title: "Video to GIF",
+      description: "Convert video clips to animated GIFs",
+      icon: <Clapperboard className="h-6 w-6 text-green-600" />,
+      href: "/tools/video-to-gif",
+      color: "hover:border-green-200",
+      badge: "New"
+    },
   ];
 
   return (
