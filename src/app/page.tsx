@@ -1,4 +1,4 @@
-import { Film, Clapperboard, Music } from "lucide-react";
+import { Film, Clapperboard, Music, Scissors } from "lucide-react";
 import Link from "next/link";
 
 interface ToolCardProps {
@@ -81,6 +81,14 @@ export default function Home() {
       icon: <Music className="h-6 w-6 text-blue-600" />,
       href: "/tools/audio-extractor",
       color: "hover:border-blue-200",
+      badge: "New"
+    },
+    {
+      title: "Audio Splitter",
+      description: "Split audio files into segments of any length",
+      icon: <Scissors className="h-6 w-6 text-orange-600" />,
+      href: "/tools/audio-splitter",
+      color: "hover:border-orange-200",
       badge: "New"
     },
   ];
