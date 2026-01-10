@@ -1,4 +1,4 @@
-import { Film, Clapperboard } from "lucide-react";
+import { Film, Clapperboard, Music } from "lucide-react";
 import Link from "next/link";
 
 interface ToolCardProps {
@@ -66,7 +66,6 @@ export default function Home() {
       icon: <Film className="h-6 w-6 text-purple-600" />,
       href: "/tools/frame-extractor",
       color: "hover:border-purple-200",
-      badge: "New"
     },
     {
       title: "Video to GIF",
@@ -74,6 +73,14 @@ export default function Home() {
       icon: <Clapperboard className="h-6 w-6 text-green-600" />,
       href: "/tools/video-to-gif",
       color: "hover:border-green-200",
+      badge: "New"
+    },
+    {
+      title: "Audio Extractor",
+      description: "Extract audio from videos",
+      icon: <Music className="h-6 w-6 text-blue-600" />,
+      href: "/tools/audio-extractor",
+      color: "hover:border-blue-200",
       badge: "New"
     },
   ];
