@@ -14,9 +14,15 @@ interface FileUploadZoneProps {
   onFilesChange: (files: FileWithPreview[]) => void;
   acceptedFileTypes?: string;
   supportedFormatsText?: string;
+  /** Main heading above the zone. Omit or pass empty to not render (e.g. when parent provides its own). */
+  title?: string;
+  /** Text inside the drop zone, e.g. "Drop videos here or click to select" or "Drop images here or click to select". */
+  dropZoneText?: string;
   showFileSize?: boolean;
   maxDisplayHeight?: string;
   disabled?: boolean;
+  /** Smaller padding and spacing for dense layouts (e.g. sidebar). */
+  compact?: boolean;
   children?: React.ReactNode; // For additional controls like format selection or quality slider
   actionButton: React.ReactNode; // For action buttons like Convert, Compress, etc.
 }
@@ -26,9 +32,12 @@ export default function FileUploadZone({
   onFilesChange,
   acceptedFileTypes = "video/*",
   supportedFormatsText = "Supports MP4, WebM, MOV, and AVI videos",
+  title = "Upload Videos",
+  dropZoneText = "Drop videos here or click to select",
   showFileSize = true,
   maxDisplayHeight = "max-h-40",
   disabled = false,
+  compact = false,
   children,
   actionButton
 }: FileUploadZoneProps) {
@@ -78,21 +87,23 @@ export default function FileUploadZone({
   const totalSize = files.reduce((sum, file) => sum + (file.originalSize || file.size), 0);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">
-        Upload Videos
-      </h2>
+    <div className={`bg-white rounded-xl border border-gray-200 ${compact ? "p-3" : "p-6"}`}>
+      {title ? (
+        <h2 className={`font-semibold text-gray-900 ${compact ? "text-base mb-2" : "text-xl mb-4"}`}>
+          {title}
+        </h2>
+      ) : null}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className={`grid grid-cols-1 lg:grid-cols-3 ${compact ? "gap-3" : "gap-6"}`}>
         {/* Additional Controls (format selection, quality slider, etc.) */}
         {children}
 
         {/* Drop Zone */}
         <div className={children ? "lg:col-span-2" : "lg:col-span-3"}>
           <div
-            className={`border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer h-full flex flex-col justify-center ${
-              disabled ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`border-2 border-dashed border-gray-300 rounded-lg text-center hover:border-gray-400 transition-colors cursor-pointer h-full flex flex-col justify-center ${
+              compact ? "p-4" : "p-8"
+            } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
             onClick={() => {
@@ -101,11 +112,11 @@ export default function FileUploadZone({
               }
             }}
           >
-            <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-2">
-              Drop videos here or click to select
+            <Upload className={`text-gray-400 mx-auto ${compact ? "h-8 w-8 mb-2" : "h-12 w-12 mb-4"}`} />
+            <p className={`text-gray-600 ${compact ? "text-sm mb-1" : "mb-2"}`}>
+              {dropZoneText}
             </p>
-            <p className="text-sm text-gray-500">
+            <p className={compact ? "text-xs text-gray-500" : "text-sm text-gray-500"}>
               {supportedFormatsText}
             </p>
             <input
@@ -123,8 +134,8 @@ export default function FileUploadZone({
 
       {/* File List */}
       {files.length > 0 && (
-        <div className="mt-6">
-          <div className="flex justify-between items-center mb-3">
+        <div className={compact ? "mt-3" : "mt-6"}>
+          <div className={`flex justify-between items-center ${compact ? "mb-2" : "mb-3"}`}>
             <h3 className="text-sm font-medium text-gray-700">
               Selected Files ({files.length})
             </h3>
@@ -165,7 +176,7 @@ export default function FileUploadZone({
       )}
 
       {/* Action Button */}
-      <div className="mt-6">
+      <div className={compact ? "mt-3" : "mt-6"}>
         {actionButton}
       </div>
     </div>

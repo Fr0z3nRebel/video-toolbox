@@ -13,6 +13,9 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@remotion/player": "4.0.410",
+    "@remotion/web-renderer": "4.0.410",
+    "@remotion/zod-types": "4.0.410",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@next/third-parties": "^15.5.9",
@@ -26,7 +29,9 @@
     "next": "^15.5.9",
     "postcss": "^8.5.6",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "remotion": "4.0.410",
+    "zod": "3.22.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",

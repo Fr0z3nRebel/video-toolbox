@@ -1,4 +1,4 @@
-import { Film, Clapperboard, Music, Scissors } from "lucide-react";
+import { Film, Clapperboard, Music, Scissors, Video } from "lucide-react";
 import Link from "next/link";
 
 interface ToolCardProps {
@@ -89,6 +89,14 @@ export default function Home() {
       icon: <Scissors className="h-6 w-6 text-orange-600" />,
       href: "/tools/audio-splitter",
       color: "hover:border-orange-200",
+      badge: "New"
+    },
+    {
+      title: "ClipArt Bundle Video Creator",
+      description: "Create Etsy (1:1) and social (9:16) MP4 videos from your assets",
+      icon: <Video className="h-6 w-6 text-indigo-600" />,
+      href: "/tools/clipart-video-creator",
+      color: "hover:border-indigo-200",
       badge: "New"
     },
   ];
