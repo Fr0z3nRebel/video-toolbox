@@ -44,11 +44,12 @@ export function SocialVertical(props: ClipartVideoCreatorProps) {
   });
 
   const scrollEndFrame = props.showEndScreenSocial ? 360 : 450;
+  const scrollStartFrame = props.showStartScreenSocial ? 90 : 0;
   const baseScrollDistance = scrollContentHeight - SOCIAL_HEIGHT;
 
   const scrollTranslateY = interpolate(
     frame,
-    [90, scrollEndFrame],
+    [scrollStartFrame, scrollEndFrame],
     [0, -baseScrollDistance],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
@@ -88,8 +89,8 @@ export function SocialVertical(props: ClipartVideoCreatorProps) {
         </AbsoluteFill>
       )}
 
-      {/* 0–3s: Ken Burns zoom on HookImage (same as 1:1), then "New Bundle Alert!" */}
-      {frame < 90 && props.hookImageUrl && (
+      {/* 0–3s: Ken Burns zoom on HookImage, then "New Bundle Alert!" (only when showStartScreenSocial) */}
+      {props.showStartScreenSocial && frame < 90 && props.hookImageUrl && (
         <AbsoluteFill>
           <Img
             src={props.hookImageUrl}
@@ -127,8 +128,8 @@ export function SocialVertical(props: ClipartVideoCreatorProps) {
         </AbsoluteFill>
       )}
 
-      {/* 3–12s (or 3–15s if no end screen): Vertical scroll – 2-column staggered, scroll up */}
-      {frame >= 90 && frame < scrollEndFrame && cellUrls.length > 0 && (
+      {/* 3–12s (or 0–15s if no start screen; or 3–15s if no end screen): Vertical scroll – 2-column staggered, scroll up */}
+      {frame >= scrollStartFrame && frame < scrollEndFrame && cellUrls.length > 0 && (
         <AbsoluteFill
           style={{
             overflow: "hidden",

@@ -1,7 +1,6 @@
 export const WIZARD_STEPS = [
-  { num: 1, label: "Hook image" },
-  { num: 2, label: "Clipart" },
-  { num: 3, label: "Mockups" },
-  { num: 4, label: "Meta" },
-  { num: 5, label: "Export" },
+  { num: 1, label: "Hook" },
+  { num: 2, label: "Content" },
+  { num: 3, label: "Meta" },
+  { num: 4, label: "Export" },
 ] as const;

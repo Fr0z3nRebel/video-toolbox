@@ -46,6 +46,8 @@ export default function ClipartVideoCreatorPage() {
   const [shopLogoFile, setShopLogoFile] = useState<FileWithPreview[]>([]);
   const [shopName, setShopName] = useState("");
   const [clipartEffect, setClipartEffect] = useState<ClipartEffect>("slide");
+  const [showStartScreenEtsy, setShowStartScreenEtsy] = useState(true);
+  const [showStartScreenSocial, setShowStartScreenSocial] = useState(true);
   const [showEndScreenEtsy, setShowEndScreenEtsy] = useState(true);
   const [showEndScreenSocial, setShowEndScreenSocial] = useState(true);
   const [activeTab, setActiveTab] = useState<"etsy" | "social">("etsy");
@@ -70,10 +72,12 @@ export default function ClipartVideoCreatorPage() {
       mockupUrls,
       shopLogoUrl: shopLogoUrl || "",
       shopName: shopName.trim() || "My Shop",
+      showStartScreenEtsy,
+      showStartScreenSocial,
       showEndScreenEtsy,
       showEndScreenSocial,
     }),
-    [hookImageUrl, clipartUrls, clipartEffect, mockupUrls, shopLogoUrl, shopName, showEndScreenEtsy, showEndScreenSocial]
+    [hookImageUrl, clipartUrls, clipartEffect, mockupUrls, shopLogoUrl, shopName, showStartScreenEtsy, showStartScreenSocial, showEndScreenEtsy, showEndScreenSocial]
   );
 
   useEffect(() => {
@@ -207,7 +211,7 @@ export default function ClipartVideoCreatorPage() {
           onFilesChange={setHookImageWithUrl}
           acceptedFileTypes="image/*"
           supportedFormatsText="PNG, JPG, WebP"
-          title="Hook image"
+          title="Hook"
           dropZoneText="Drop image here or click to select"
           showFileSize
           maxDisplayHeight="max-h-20"
@@ -259,9 +263,6 @@ export default function ClipartVideoCreatorPage() {
             <span className="text-xs text-gray-500">Multiple images</span>
           }
         />
-      </div>
-    ) : step === 3 ? (
-      <div className="space-y-4">
         <p className="text-sm text-gray-600">
           Optional. Mockup images appear every other slot in the clipart scroll.
           If you add fewer mockups than clipart, they are spaced out for balance.
@@ -282,7 +283,7 @@ export default function ClipartVideoCreatorPage() {
           }
         />
       </div>
-    ) : step === 4 ? (
+    ) : step === 3 ? (
       <div className="space-y-4">
         <label className="block text-sm font-bold text-gray-700 mb-2">
           Shop title
@@ -317,6 +318,34 @@ export default function ClipartVideoCreatorPage() {
     ) : (
       <div className="space-y-4">
         <div className="space-y-2">
+          <p className="text-sm font-medium text-gray-700">Start screen (0–3s hook image)</p>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showStartScreenEtsy}
+              onChange={(e) => setShowStartScreenEtsy(e.target.checked)}
+              disabled={isRendering}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-700">
+              Show start screen on Etsy Listing (1:1)
+            </span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showStartScreenSocial}
+              onChange={(e) => setShowStartScreenSocial(e.target.checked)}
+              disabled={isRendering}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-700">
+              Show start screen on Social Short (9:16)
+            </span>
+          </label>
+        </div>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-gray-700">End screen (12–15s)</p>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
@@ -325,7 +354,7 @@ export default function ClipartVideoCreatorPage() {
               disabled={isRendering}
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm text-gray-700">
               Show end screen on 1:1 (logo, PNGs included, commercial use)
             </span>
           </label>
@@ -337,7 +366,7 @@ export default function ClipartVideoCreatorPage() {
               disabled={isRendering}
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm text-gray-700">
               Show end screen on 9:16 (logo, LINK IN BIO)
             </span>
           </label>

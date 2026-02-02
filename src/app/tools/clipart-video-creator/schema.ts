@@ -15,6 +15,8 @@ export const clipartVideoCreatorSchema = z.object({
   mockupUrls: z.array(z.string()),
   shopLogoUrl: z.string(),
   shopName: z.string(),
+  showStartScreenEtsy: z.boolean(),
+  showStartScreenSocial: z.boolean(),
   showEndScreenEtsy: z.boolean(),
   showEndScreenSocial: z.boolean(),
 });

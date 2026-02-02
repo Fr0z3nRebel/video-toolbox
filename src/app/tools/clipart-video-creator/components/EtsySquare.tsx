@@ -71,23 +71,29 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
 
   const slideDistance = (Math.max(0, gridChunks.length - 1)) * ETSY_WIDTH;
   const scrollEndFrame = props.showEndScreenEtsy ? 360 : 450;
+  const scrollStartFrame = props.showStartScreenEtsy ? 90 : 0;
+  /** Side scroll: end when the last column is in the scene (visible on the right), not scrolled all the way left. Scroll half a chunk less so we end with last column on the right half of the viewport — no white space on the right. */
+  const sideScrollDistance =
+    gridChunks.length <= 1
+      ? 0
+      : Math.max(0, (gridChunks.length - 1) * ETSY_WIDTH - ETSY_WIDTH / 2);
 
   const gridSlideX = interpolate(
     frame,
-    [90, scrollEndFrame],
-    [0, -slideDistance],
+    [scrollStartFrame, scrollEndFrame],
+    [0, -sideScrollDistance],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
   const alternateTopSlideX = interpolate(
     frame,
-    [90, scrollEndFrame],
+    [scrollStartFrame, scrollEndFrame],
     [0, -slideDistance],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
   const alternateBottomSlideX = interpolate(
     frame,
-    [90, scrollEndFrame],
+    [scrollStartFrame, scrollEndFrame],
     [-slideDistance, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
@@ -103,8 +109,8 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
 
   return (
     <AbsoluteFill style={{ backgroundColor: OFF_WHITE }}>
-      {/* 0–3s: Ken Burns zoom on HookImage */}
-      {frame < 90 && props.hookImageUrl && (
+      {/* 0–3s: Ken Burns zoom on HookImage (only when showStartScreenEtsy) */}
+      {props.showStartScreenEtsy && frame < 90 && props.hookImageUrl && (
         <AbsoluteFill>
           <Img
             src={props.hookImageUrl}
@@ -119,8 +125,8 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
         </AbsoluteFill>
       )}
 
-      {/* 3–12s (or 3–15s if no end screen): Grid slide – 2x2 grids, horizontal */}
-      {frame >= 90 && frame < scrollEndFrame && gridChunks.length > 0 && isSlide && (
+      {/* 3–12s (or 0–15s if no start screen; or 3–15s if no end screen): Grid slide – 2x2 grids, horizontal */}
+      {frame >= scrollStartFrame && frame < scrollEndFrame && gridChunks.length > 0 && isSlide && (
         <AbsoluteFill
           style={{
             backgroundColor: OFF_WHITE,
@@ -183,7 +189,7 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
       )}
 
       {/* 3–12s (or 3–15s if no end screen): Diagonal – strip is at 27.5° angle, scroll along the strip */}
-      {frame >= 90 && frame < scrollEndFrame && gridChunks.length > 0 && isDiagonalSlide && (
+      {frame >= scrollStartFrame && frame < scrollEndFrame && gridChunks.length > 0 && isDiagonalSlide && (
         <AbsoluteFill
           style={{
             backgroundColor: OFF_WHITE,
@@ -257,7 +263,7 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
       )}
 
       {/* 3–12s (or 3–15s if no end screen): Alternate slide – top row left, bottom row right */}
-      {frame >= 90 && frame < scrollEndFrame && gridChunks.length > 0 && isAlternateSlide && (
+      {frame >= scrollStartFrame && frame < scrollEndFrame && gridChunks.length > 0 && isAlternateSlide && (
         <AbsoluteFill
           style={{
             backgroundColor: OFF_WHITE,
@@ -394,7 +400,7 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
       )}
 
       {/* 3–12s: Alternate diagonal – strips at 27.5°, divide between top/bottom is angled 27.5° */}
-      {frame >= 90 &&
+      {frame >= scrollStartFrame &&
         frame < scrollEndFrame &&
         gridChunks.length > 0 &&
         isAlternateDiagonalSlide && (
