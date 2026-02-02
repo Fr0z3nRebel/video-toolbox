@@ -45,6 +45,8 @@ export default function ClipartVideoCreatorPage() {
   const [shopLogoFile, setShopLogoFile] = useState<FileWithPreview[]>([]);
   const [shopName, setShopName] = useState("");
   const [clipartEffect, setClipartEffect] = useState<ClipartEffect>("slide");
+  const [showEndScreenEtsy, setShowEndScreenEtsy] = useState(true);
+  const [showEndScreenSocial, setShowEndScreenSocial] = useState(true);
   const [activeTab, setActiveTab] = useState<"etsy" | "social">("etsy");
   const [canRenderOnWeb, setCanRenderOnWeb] = useState<boolean | null>(null);
 
@@ -62,8 +64,10 @@ export default function ClipartVideoCreatorPage() {
       clipartEffect,
       shopLogoUrl: shopLogoUrl || "",
       shopName: shopName.trim() || "My Shop",
+      showEndScreenEtsy,
+      showEndScreenSocial,
     }),
-    [hookImageUrl, clipartUrls, clipartEffect, shopLogoUrl, shopName]
+    [hookImageUrl, clipartUrls, clipartEffect, shopLogoUrl, shopName, showEndScreenEtsy, showEndScreenSocial]
   );
 
   useEffect(() => {
@@ -79,11 +83,13 @@ export default function ClipartVideoCreatorPage() {
   }, []);
 
   const canRender = useMemo(() => {
+    const needsLogo =
+      inputProps.showEndScreenEtsy || inputProps.showEndScreenSocial;
     return (
       canRenderOnWeb === true &&
       !!inputProps.hookImageUrl &&
       inputProps.clipartUrls.length > 0 &&
-      !!inputProps.shopLogoUrl
+      (needsLogo ? !!inputProps.shopLogoUrl : true)
     );
   }, [canRenderOnWeb, inputProps]);
 
@@ -250,6 +256,35 @@ export default function ClipartVideoCreatorPage() {
       </div>
     ) : (
       <div className="space-y-4">
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showEndScreenEtsy}
+              onChange={(e) => setShowEndScreenEtsy(e.target.checked)}
+              disabled={isRendering}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              Show end screen on 1:1 (logo, PNGs included, commercial use)
+            </span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showEndScreenSocial}
+              onChange={(e) => setShowEndScreenSocial(e.target.checked)}
+              disabled={isRendering}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              Show end screen on 9:16 (logo, LINK IN BIO)
+            </span>
+          </label>
+        </div>
+        <p className="text-xs text-gray-500">
+          When unchecked, the scroll is slowed so the last image fully appears at 15s (no end screen, no white space).
+        </p>
         {(isRenderingEtsy ||
           isRenderingSocial ||
           (progress > 0 && activeCompositionId)) && (

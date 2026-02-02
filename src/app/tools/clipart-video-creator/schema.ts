@@ -14,6 +14,8 @@ export const clipartVideoCreatorSchema = z.object({
   clipartEffect: z.enum(clipartEffectOptions),
   shopLogoUrl: z.string(),
   shopName: z.string(),
+  showEndScreenEtsy: z.boolean(),
+  showEndScreenSocial: z.boolean(),
 });
 
 export type ClipartVideoCreatorProps = z.infer<typeof clipartVideoCreatorSchema>;

@@ -33,10 +33,13 @@ export function SocialVertical(props: ClipartVideoCreatorProps) {
     extrapolateRight: "clamp",
   });
 
+  const scrollEndFrame = props.showEndScreenSocial ? 360 : 450;
+  const baseScrollDistance = scrollContentHeight - SOCIAL_HEIGHT;
+
   const scrollTranslateY = interpolate(
     frame,
-    [90, 360],
-    [0, -(scrollContentHeight - SOCIAL_HEIGHT)],
+    [90, scrollEndFrame],
+    [0, -baseScrollDistance],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
@@ -114,8 +117,8 @@ export function SocialVertical(props: ClipartVideoCreatorProps) {
         </AbsoluteFill>
       )}
 
-      {/* 3–12s: Vertical scroll – 2-column staggered, scroll up */}
-      {frame >= 90 && frame < 360 && props.clipartUrls.length > 0 && (
+      {/* 3–12s (or 3–15s if no end screen): Vertical scroll – 2-column staggered, scroll up */}
+      {frame >= 90 && frame < scrollEndFrame && props.clipartUrls.length > 0 && (
         <AbsoluteFill
           style={{
             overflow: "hidden",
@@ -175,8 +178,8 @@ export function SocialVertical(props: ClipartVideoCreatorProps) {
         </AbsoluteFill>
       )}
 
-      {/* 12–15s: CTA – ShopLogo (your logo appears here), "LINK IN BIO", animated arrow */}
-      {frame >= 360 && (
+      {/* 12–15s: CTA – ShopLogo (your logo appears here), "LINK IN BIO", animated arrow (only when showEndScreenSocial) */}
+      {frame >= 360 && props.showEndScreenSocial && (
         <AbsoluteFill
           style={{
             justifyContent: "center",
