@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import { AbsoluteFill, Img, useCurrentFrame, interpolate } from "remotion";
 import type { ClipartVideoCreatorProps } from "../schema";
+import { buildInterleavedCellUrls } from "../utils/cellUrls";
 
 const ETSY_WIDTH = 1080;
 const ETSY_HEIGHT = 1080;
@@ -42,13 +43,27 @@ function chunk<T>(arr: T[], size: number): T[][] {
   return chunks;
 }
 
+/** For a 2×2 grid cell index 0..3: when chunk has exactly 2 items, put them in left column (0 and 2) so they stack instead of sitting side by side on the top row. */
+function getCellUrlForGrid(
+  urls: (string | undefined)[],
+  cellIndex: number
+): string | undefined {
+  if (urls.length === 2) {
+    return cellIndex === 0 ? urls[0] : cellIndex === 2 ? urls[1] : undefined;
+  }
+  return urls[cellIndex];
+}
+
 export function EtsySquare(props: ClipartVideoCreatorProps) {
   const frame = useCurrentFrame();
 
-  const gridChunks = useMemo(
-    () => chunk(props.clipartUrls, 4),
-    [props.clipartUrls]
-  );
+  const gridChunks = useMemo(() => {
+    const cells = buildInterleavedCellUrls(
+      props.clipartUrls,
+      props.mockupUrls ?? []
+    );
+    return chunk(cells, 4);
+  }, [props.clipartUrls, props.mockupUrls]);
 
   const kenBurnsScale = interpolate(frame, [0, 90], [1.4, 1], {
     extrapolateRight: "clamp",
@@ -134,7 +149,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                   gap: 0,
                 }}
               >
-                {[0, 1, 2, 3].map((i) => (
+                {[0, 1, 2, 3].map((i) => {
+                  const cellUrl = getCellUrlForGrid(urls, i);
+                  return (
                   <div
                     key={i}
                     style={{
@@ -147,9 +164,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                       padding: 8,
                     }}
                   >
-                    {urls[i] ? (
+                    {cellUrl ? (
                       <Img
-                        src={urls[i]}
+                        src={cellUrl}
                         style={{
                           width: "100%",
                           height: "100%",
@@ -158,7 +175,7 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                       />
                     ) : null}
                   </div>
-                ))}
+                ); })}
               </div>
             ))}
           </div>
@@ -205,7 +222,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                     gap: 0,
                   }}
                 >
-                  {[0, 1, 2, 3].map((i) => (
+                  {[0, 1, 2, 3].map((i) => {
+                    const cellUrl = getCellUrlForGrid(urls, i);
+                    return (
                     <div
                       key={i}
                       style={{
@@ -218,9 +237,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                         padding: 8,
                       }}
                     >
-                      {urls[i] ? (
+                      {cellUrl ? (
                         <Img
-                          src={urls[i]}
+                          src={cellUrl}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -229,7 +248,7 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                         />
                       ) : null}
                     </div>
-                  ))}
+                    ); })}
                 </div>
               ))}
             </div>
@@ -277,7 +296,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                     gap: 0,
                   }}
                 >
-                  {[0, 1].map((i) => (
+                  {[0, 1].map((i) => {
+                    const cellUrl = getCellUrlForGrid(urls, i);
+                    return (
                     <div
                       key={i}
                       style={{
@@ -290,9 +311,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                         padding: 4,
                       }}
                     >
-                      {urls[i] ? (
+                      {cellUrl ? (
                         <Img
-                          src={urls[i]}
+                          src={cellUrl}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -301,7 +322,7 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                         />
                       ) : null}
                     </div>
-                  ))}
+                    ); })}
                 </div>
               ))}
             </div>
@@ -338,7 +359,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                     gap: 0,
                   }}
                 >
-                  {[2, 3].map((i) => (
+                  {[2, 3].map((i) => {
+                    const cellUrl = getCellUrlForGrid(urls, i);
+                    return (
                     <div
                       key={i}
                       style={{
@@ -351,9 +374,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                         padding: 4,
                       }}
                     >
-                      {urls[i] ? (
+                      {cellUrl ? (
                         <Img
-                          src={urls[i]}
+                          src={cellUrl}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -362,7 +385,7 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                         />
                       ) : null}
                     </div>
-                  ))}
+                    ); })}
                 </div>
               ))}
             </div>
@@ -424,7 +447,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                         gap: 0,
                       }}
                     >
-                      {[0, 1].map((i) => (
+                      {[0, 1].map((i) => {
+                        const cellUrl = getCellUrlForGrid(urls, i);
+                        return (
                         <div
                           key={i}
                           style={{
@@ -437,9 +462,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                             padding: 4,
                           }}
                         >
-                          {urls[i] ? (
+                          {cellUrl ? (
                             <Img
-                              src={urls[i]}
+                              src={cellUrl}
                               style={{
                                 width: "100%",
                                 height: "100%",
@@ -448,7 +473,7 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                             />
                           ) : null}
                         </div>
-                      ))}
+                        ); })}
                     </div>
                   ))}
                 </div>
@@ -497,7 +522,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                         gap: 0,
                       }}
                     >
-                      {[2, 3].map((i) => (
+                      {[2, 3].map((i) => {
+                        const cellUrl = getCellUrlForGrid(urls, i);
+                        return (
                         <div
                           key={i}
                           style={{
@@ -510,9 +537,9 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                             padding: 4,
                           }}
                         >
-                          {urls[i] ? (
+                          {cellUrl ? (
                             <Img
-                              src={urls[i]}
+                              src={cellUrl}
                               style={{
                                 width: "100%",
                                 height: "100%",
@@ -521,7 +548,7 @@ export function EtsySquare(props: ClipartVideoCreatorProps) {
                             />
                           ) : null}
                         </div>
-                      ))}
+                        ); })}
                     </div>
                   ))}
                 </div>

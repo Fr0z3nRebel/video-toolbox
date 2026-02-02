@@ -12,6 +12,7 @@ export const clipartVideoCreatorSchema = z.object({
   hookImageUrl: z.string(),
   clipartUrls: z.array(z.string()),
   clipartEffect: z.enum(clipartEffectOptions),
+  mockupUrls: z.array(z.string()),
   shopLogoUrl: z.string(),
   shopName: z.string(),
   showEndScreenEtsy: z.boolean(),

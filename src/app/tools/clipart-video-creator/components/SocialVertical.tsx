@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import { AbsoluteFill, Img, useCurrentFrame, interpolate } from "remotion";
 import type { ClipartVideoCreatorProps } from "../schema";
+import { buildInterleavedCellUrls } from "../utils/cellUrls";
 
 const SOCIAL_WIDTH = 1080;
 const SOCIAL_HEIGHT = 1920;
@@ -23,11 +24,20 @@ export const socialVerticalConfig = {
 export function SocialVertical(props: ClipartVideoCreatorProps) {
   const frame = useCurrentFrame();
 
-  const scrollContentHeight = useMemo(() => {
-    const count = props.clipartUrls.length;
-    const rows = Math.ceil(count / 2);
-    return rows * (CELL_SIZE + GAP) + GAP;
-  }, [props.clipartUrls.length]);
+  const cellUrls = useMemo(
+    () =>
+      buildInterleavedCellUrls(
+        props.clipartUrls,
+        props.mockupUrls ?? []
+      ),
+    [props.clipartUrls, props.mockupUrls]
+  );
+
+  const rowCount = Math.ceil(cellUrls.length / 2);
+  const scrollContentHeight = useMemo(
+    () => rowCount * (CELL_SIZE + GAP) + GAP,
+    [rowCount]
+  );
 
   const kenBurnsScale = interpolate(frame, [0, 90], [1.4, 0.75], {
     extrapolateRight: "clamp",
@@ -118,7 +128,7 @@ export function SocialVertical(props: ClipartVideoCreatorProps) {
       )}
 
       {/* 3–12s (or 3–15s if no end screen): Vertical scroll – 2-column staggered, scroll up */}
-      {frame >= 90 && frame < scrollEndFrame && props.clipartUrls.length > 0 && (
+      {frame >= 90 && frame < scrollEndFrame && cellUrls.length > 0 && (
         <AbsoluteFill
           style={{
             overflow: "hidden",
@@ -146,11 +156,12 @@ export function SocialVertical(props: ClipartVideoCreatorProps) {
                   flexShrink: 0,
                 }}
               >
-                {props.clipartUrls
-                  .filter((_, i) => i % 2 === col)
-                  .map((url, i) => (
+                {Array.from({ length: rowCount }, (_, rowIdx) => {
+                  const globalIndex = col + rowIdx * 2;
+                  const url = cellUrls[globalIndex];
+                  return (
                     <div
-                      key={`${col}-${i}`}
+                      key={`${col}-${rowIdx}`}
                       style={{
                         width: "100%",
                         height: CELL_SIZE,
@@ -162,16 +173,19 @@ export function SocialVertical(props: ClipartVideoCreatorProps) {
                         justifyContent: "center",
                       }}
                     >
-                      <Img
-                        src={url}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "contain",
-                        }}
-                      />
+                      {url ? (
+                        <Img
+                          src={url}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      ) : null}
                     </div>
-                  ))}
+                  );
+                })}
               </div>
             ))}
           </div>

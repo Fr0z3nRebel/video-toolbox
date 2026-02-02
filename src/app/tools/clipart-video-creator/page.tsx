@@ -42,6 +42,7 @@ export default function ClipartVideoCreatorPage() {
     useWizard(1);
   const [hookImageFile, setHookImageFile] = useState<FileWithPreview[]>([]);
   const [clipartFiles, setClipartFiles] = useState<FileWithPreview[]>([]);
+  const [mockupFiles, setMockupFiles] = useState<FileWithPreview[]>([]);
   const [shopLogoFile, setShopLogoFile] = useState<FileWithPreview[]>([]);
   const [shopName, setShopName] = useState("");
   const [clipartEffect, setClipartEffect] = useState<ClipartEffect>("slide");
@@ -55,6 +56,10 @@ export default function ClipartVideoCreatorPage() {
     () => clipartFiles.map((f) => f.preview).filter((u): u is string => !!u),
     [clipartFiles]
   );
+  const mockupUrls = useMemo(
+    () => mockupFiles.map((f) => f.preview).filter((u): u is string => !!u),
+    [mockupFiles]
+  );
   const shopLogoUrl = shopLogoFile[0]?.preview ?? "";
 
   const inputProps: ClipartVideoCreatorProps = useMemo(
@@ -62,12 +67,13 @@ export default function ClipartVideoCreatorPage() {
       hookImageUrl: hookImageUrl ?? "",
       clipartUrls,
       clipartEffect,
+      mockupUrls,
       shopLogoUrl: shopLogoUrl || "",
       shopName: shopName.trim() || "My Shop",
       showEndScreenEtsy,
       showEndScreenSocial,
     }),
-    [hookImageUrl, clipartUrls, clipartEffect, shopLogoUrl, shopName, showEndScreenEtsy, showEndScreenSocial]
+    [hookImageUrl, clipartUrls, clipartEffect, mockupUrls, shopLogoUrl, shopName, showEndScreenEtsy, showEndScreenSocial]
   );
 
   useEffect(() => {
@@ -101,46 +107,81 @@ export default function ClipartVideoCreatorPage() {
     activeCompositionId,
   } = useRenderVideo();
 
-  const setHookImageWithUrl = useCallback((files: FileWithPreview[]) => {
-    files.forEach((f) => f.preview && revokeBlobUrl(f.preview));
-    const toProcess = files.slice(0, 1);
-    Promise.all(
-      toProcess.map(async (f) => ({
-        ...f,
-        id: (f as FileWithPreview).id || Math.random().toString(36).slice(2),
-        preview: await fileToDataUrl(f),
-      }))
-    ).then((withPreviews) =>
-      setHookImageFile(withPreviews as FileWithPreview[])
-    );
-  }, []);
+  /** Only convert to data URL when the item is a real File; keep existing data URL previews (e.g. when adding more files after initial upload). */
+  const ensureDataUrl = useCallback(
+    async (f: FileWithPreview): Promise<string> => {
+      if (f instanceof File) return fileToDataUrl(f);
+      const p = f.preview;
+      return typeof p === "string" && p.startsWith("data:") ? p : "";
+    },
+    []
+  );
 
-  const setClipartWithUrls = useCallback((files: FileWithPreview[]) => {
-    files.forEach((f) => f.preview && revokeBlobUrl(f.preview));
-    Promise.all(
-      files.map(async (f) => ({
-        ...f,
-        id: (f as FileWithPreview).id || Math.random().toString(36).slice(2),
-        preview: await fileToDataUrl(f),
-      }))
-    ).then((withPreviews) =>
-      setClipartFiles(withPreviews as FileWithPreview[])
-    );
-  }, []);
+  const setHookImageWithUrl = useCallback(
+    (files: FileWithPreview[]) => {
+      files.forEach((f) => f.preview?.startsWith?.("blob:") && revokeBlobUrl(f.preview));
+      const toProcess = files.slice(0, 1);
+      Promise.all(
+        toProcess.map(async (f) => ({
+          ...f,
+          id: (f as FileWithPreview).id || Math.random().toString(36).slice(2),
+          preview: await ensureDataUrl(f),
+        }))
+      ).then((withPreviews) =>
+        setHookImageFile(withPreviews as FileWithPreview[])
+      );
+    },
+    [ensureDataUrl]
+  );
 
-  const setShopLogoWithUrl = useCallback((files: FileWithPreview[]) => {
-    files.forEach((f) => f.preview && revokeBlobUrl(f.preview));
-    const toProcess = files.slice(0, 1);
-    Promise.all(
-      toProcess.map(async (f) => ({
-        ...f,
-        id: (f as FileWithPreview).id || Math.random().toString(36).slice(2),
-        preview: await fileToDataUrl(f),
-      }))
-    ).then((withPreviews) =>
-      setShopLogoFile(withPreviews as FileWithPreview[])
-    );
-  }, []);
+  const setClipartWithUrls = useCallback(
+    (files: FileWithPreview[]) => {
+      files.forEach((f) => f.preview?.startsWith?.("blob:") && revokeBlobUrl(f.preview));
+      Promise.all(
+        files.map(async (f) => ({
+          ...f,
+          id: (f as FileWithPreview).id || Math.random().toString(36).slice(2),
+          preview: await ensureDataUrl(f),
+        }))
+      ).then((withPreviews) =>
+        setClipartFiles(withPreviews as FileWithPreview[])
+      );
+    },
+    [ensureDataUrl]
+  );
+
+  const setMockupWithUrls = useCallback(
+    (files: FileWithPreview[]) => {
+      files.forEach((f) => f.preview?.startsWith?.("blob:") && revokeBlobUrl(f.preview));
+      Promise.all(
+        files.map(async (f) => ({
+          ...f,
+          id: (f as FileWithPreview).id || Math.random().toString(36).slice(2),
+          preview: await ensureDataUrl(f),
+        }))
+      ).then((withPreviews) =>
+        setMockupFiles(withPreviews as FileWithPreview[])
+      );
+    },
+    [ensureDataUrl]
+  );
+
+  const setShopLogoWithUrl = useCallback(
+    (files: FileWithPreview[]) => {
+      files.forEach((f) => f.preview?.startsWith?.("blob:") && revokeBlobUrl(f.preview));
+      const toProcess = files.slice(0, 1);
+      Promise.all(
+        toProcess.map(async (f) => ({
+          ...f,
+          id: (f as FileWithPreview).id || Math.random().toString(36).slice(2),
+          preview: await ensureDataUrl(f),
+        }))
+      ).then((withPreviews) =>
+        setShopLogoFile(withPreviews as FileWithPreview[])
+      );
+    },
+    [ensureDataUrl]
+  );
 
   const handleRenderEtsy = useCallback(() => {
     const parsed = clipartVideoCreatorSchema.safeParse(inputProps);
@@ -222,21 +263,22 @@ export default function ClipartVideoCreatorPage() {
     ) : step === 3 ? (
       <div className="space-y-4">
         <p className="text-sm text-gray-600">
-          Shows at end of Social Short (9:16) above &quot;LINK IN BIO&quot;.
+          Optional. Mockup images appear every other slot in the clipart scroll.
+          If you add fewer mockups than clipart, they are spaced out for balance.
         </p>
         <FileUploadZone
-          files={shopLogoFile}
-          onFilesChange={setShopLogoWithUrl}
+          files={mockupFiles}
+          onFilesChange={setMockupWithUrls}
           acceptedFileTypes="image/*"
-          supportedFormatsText="PNG, JPG"
-          title="Shop logo"
-          dropZoneText="Drop logo here or click"
+          supportedFormatsText="PNG, JPG (multiple)"
+          title="Mockups"
+          dropZoneText="Drop mockup images or click to select"
           showFileSize
-          maxDisplayHeight="max-h-20"
+          maxDisplayHeight="max-h-24"
           disabled={isRendering}
           compact
           actionButton={
-            <span className="text-xs text-gray-500">Single image</span>
+            <span className="text-xs text-gray-500">Optional, multiple</span>
           }
         />
       </div>
@@ -252,6 +294,24 @@ export default function ClipartVideoCreatorPage() {
           placeholder="My Shop"
           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
           disabled={isRendering}
+        />
+        <p className="text-sm text-gray-600">
+          Logo shows at end of 1:1 (above text) and Social Short (9:16) above &quot;LINK IN BIO&quot; when end screen is on.
+        </p>
+        <FileUploadZone
+          files={shopLogoFile}
+          onFilesChange={setShopLogoWithUrl}
+          acceptedFileTypes="image/*"
+          supportedFormatsText="PNG, JPG"
+          title="Shop logo"
+          dropZoneText="Drop logo here or click"
+          showFileSize
+          maxDisplayHeight="max-h-20"
+          disabled={isRendering}
+          compact
+          actionButton={
+            <span className="text-xs text-gray-500">Single image</span>
+          }
         />
       </div>
     ) : (
