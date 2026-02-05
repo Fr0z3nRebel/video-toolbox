@@ -127,7 +127,6 @@ export function SocialVertical(props: ClipartVideoCreatorProps) {
           </AbsoluteFill>
         </AbsoluteFill>
       )}
-
       {/* 3–12s (or 0–15s if no start screen; or 3–15s if no end screen): Vertical scroll – 2-column staggered, scroll up */}
       {frame >= scrollStartFrame && frame < scrollEndFrame && cellUrls.length > 0 && (
         <AbsoluteFill

@@ -92,16 +92,13 @@ export default function ClipartVideoCreatorPage() {
       .catch(() => setCanRenderOnWeb(false));
   }, []);
 
-  const canRender = useMemo(() => {
-    const needsLogo =
-      inputProps.showEndScreenEtsy || inputProps.showEndScreenSocial;
-    return (
+  const canRender = useMemo(
+    () =>
       canRenderOnWeb === true &&
       !!inputProps.hookImageUrl &&
-      inputProps.clipartUrls.length > 0 &&
-      (needsLogo ? !!inputProps.shopLogoUrl : true)
-    );
-  }, [canRenderOnWeb, inputProps]);
+      inputProps.clipartUrls.length > 0,
+    [canRenderOnWeb, inputProps]
+  );
 
   const {
     render,
@@ -115,7 +112,7 @@ export default function ClipartVideoCreatorPage() {
   const ensureDataUrl = useCallback(
     async (f: FileWithPreview): Promise<string> => {
       if (f instanceof File) return fileToDataUrl(f);
-      const p = f.preview;
+      const p = (f as { preview?: string }).preview;
       return typeof p === "string" && p.startsWith("data:") ? p : "";
     },
     []

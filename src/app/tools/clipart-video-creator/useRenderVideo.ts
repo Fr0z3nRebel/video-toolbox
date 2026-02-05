@@ -47,8 +47,14 @@ export function useRenderVideo() {
         const defaultProps: ClipartVideoCreatorProps = {
           hookImageUrl: "",
           clipartUrls: [],
+          clipartEffect: "slide",
+          mockupUrls: [],
           shopLogoUrl: "",
           shopName: "",
+          showStartScreenEtsy: true,
+          showStartScreenSocial: true,
+          showEndScreenEtsy: true,
+          showEndScreenSocial: true,
         };
 
         const result = await renderMediaOnWeb({

@@ -10,8 +10,14 @@ import type { ClipartVideoCreatorProps } from "../schema";
 const defaultProps: ClipartVideoCreatorProps = {
   hookImageUrl: "",
   clipartUrls: [],
+  clipartEffect: "slide",
+  mockupUrls: [],
   shopLogoUrl: "",
   shopName: "",
+  showStartScreenEtsy: true,
+  showStartScreenSocial: true,
+  showEndScreenEtsy: true,
+  showEndScreenSocial: true,
 };
 
 export function RemotionRoot() {
